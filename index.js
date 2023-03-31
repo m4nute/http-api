@@ -1,6 +1,13 @@
 const express = require('express')
 const axios = require('axios')
+const session = require('express-session');
 const app = express();
+
+app.use(session({
+    secret: 'b801d7cc380d2eebcb45e7e81e683fbaf9f882373843d5c2616a68c4168dd8cd455ea504d1122bdf09485ce4ec4da21bb25ab020cb242cc5c4f7265048de4cef',
+    resave: false,
+    saveUninitialized: true
+}));
 
 app.get('/favicon.ico', (req, res) => {
     res.status(204).end();
@@ -18,6 +25,15 @@ app.get('/hola', async (req, res) => {
     const greetings = names.map((name, index) => `Hola ${name} ${surnames[index]} <br>`);
 
     res.send(greetings.join(""));
+});
+
+app.get('/contador', (req, res) => {
+    if (!req.session.views) {
+        req.session.views = 1;
+    } else {
+        req.session.views++;
+    }
+    res.send(`Número de visitas: ${req.session.views}`);
 });
 
 app.get('/:name', async (req, res) => {
@@ -39,6 +55,9 @@ app.get('/:name', async (req, res) => {
         res.status(500).send('Oops! Something went wrong.');
     }
 });
+
+
+
 
 app.listen(8000, () => {
     console.log("Running on port 8000.");
